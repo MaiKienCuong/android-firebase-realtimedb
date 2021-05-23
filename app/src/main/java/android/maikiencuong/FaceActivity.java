@@ -10,6 +10,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,7 +29,7 @@ public class FaceActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
 
     private String uid = "";
-    private User user=new User();
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,28 +47,22 @@ public class FaceActivity extends AppCompatActivity {
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference("users");
 
-        if (auth.getCurrentUser() == null || user == null) {
+        if (auth.getCurrentUser() == null) {
             startActivity(new Intent(FaceActivity.this, MainActivity.class));
             finish();
         }
         uid = auth.getCurrentUser().getUid();
-        try {
-            databaseReference.child(uid).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    user = snapshot.getValue(User.class);
-                }
+        databaseReference.child(uid).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                user = snapshot.getValue(User.class);
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-                }
-            });
-        } catch (Exception e) {
-            Toast.makeText(this, "User deleted. Please login", Toast.LENGTH_LONG).show();
-            startActivity(new Intent(FaceActivity.this, MainActivity.class));
-            finish();
-        }
+            }
+        });
 
         btnFinish.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,36 +74,40 @@ public class FaceActivity extends AppCompatActivity {
         btnBored.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                user.setBored(user.getBored() + 1);
-                databaseReference.child(uid).child("bored").setValue(user.getBored());
-                Toast.makeText(FaceActivity.this, "bored: " + user.getBored(), Toast.LENGTH_SHORT).show();
+                if (user != null) {
+                    user.setBored(user.getBored() + 1);
+                    databaseReference.child(uid).child("bored").setValue(user.getBored());
+                    Toast.makeText(FaceActivity.this, "bored: " + user.getBored(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
         btnSmile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                user.setSmile(user.getSmile() + 1);
-                databaseReference.child(uid).child("smile").setValue(user.getSmile());
-                Toast.makeText(FaceActivity.this, "smile: " + user.getSmile(), Toast.LENGTH_SHORT).show();
+                if (user != null) {
+                    user.setSmile(user.getSmile() + 1);
+                    databaseReference.child(uid).child("smile").setValue(user.getSmile());
+                    Toast.makeText(FaceActivity.this, "smile: " + user.getSmile(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
         btnAngry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                user.setAngry(user.getAngry() + 1);
-                databaseReference.child(uid).child("angry").setValue(user.getAngry());
-                Toast.makeText(FaceActivity.this, "angry: " + user.getAngry(), Toast.LENGTH_SHORT).show();
+                if (user != null) {
+                    user.setAngry(user.getAngry() + 1);
+                    databaseReference.child(uid).child("angry").setValue(user.getAngry());
+                    Toast.makeText(FaceActivity.this, "angry: " + user.getAngry(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         btnSignout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (auth != null) {
-                    auth.signOut();
-                    startActivity(new Intent(FaceActivity.this, MainActivity.class));
-                    finish();
-                }
+                auth.signOut();
+                startActivity(new Intent(FaceActivity.this, MainActivity.class));
+                finish();
             }
         });
     }

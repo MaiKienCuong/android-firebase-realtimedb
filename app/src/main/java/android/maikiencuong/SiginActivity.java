@@ -51,7 +51,8 @@ public class SiginActivity extends AppCompatActivity {
                                         startActivity(new Intent(SiginActivity.this, FaceActivity.class));
                                         finish();
                                     } else {
-                                        Toast.makeText(SiginActivity.this, "Đăng nhập không thành công: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(SiginActivity.this, "Đăng nhập không thành công: "
+                                                + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
